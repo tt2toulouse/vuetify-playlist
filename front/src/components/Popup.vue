@@ -76,13 +76,7 @@ export default {
           person: this.person,
           due: format(this.due, "Do MMM YYYY")
         };
-        db.collection("projects")
-          .add(project)
-          .then(() => {
-            this.loading = false;
-            this.dialog = false;
-            this.$emit("projectAdded");
-          });
+
       }
     }
   },
@@ -94,11 +88,7 @@ export default {
   },
 
   created() {
-    fetch("http://localhost:3000/projects").then(projectsFromBackend => {
-      const json = projectsFromBackend.json().then(json => {
-        this.projects = json;
-      });
-    });
+
   }
 
 

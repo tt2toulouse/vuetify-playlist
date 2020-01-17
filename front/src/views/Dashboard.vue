@@ -5,18 +5,17 @@
     <v-container class="my-5">
       <v-layout row justify-start class="mb-3">
         <v-tooltip top>
-          <v-btn small flat color="grey" @click="sortBy('title')" slot="activator">
-            <v-icon small left>folder</v-icon>
-            <span class="caption text-lowercase">By project name</span>
+          <v-btn
+            small
+            flat
+            color="grey"
+            @click="sortBy('due')"
+            slot="activator"
+          >
+            <v-icon small left>date_range</v-icon>
+            <span class="caption text-lowercase">Par date de départ</span>
           </v-btn>
           <span>Sort by project name</span>
-        </v-tooltip>
-        <v-tooltip top>
-          <v-btn small flat color="grey" @click="sortBy('person')" slot="activator">
-            <v-icon small left>person</v-icon>
-            <span class="caption text-lowercase">By Person</span>
-          </v-btn>
-          <span>Sort by project author</span>
         </v-tooltip>
       </v-layout>
 
@@ -75,12 +74,17 @@ export default {
       this.editedIndex = this.projects.indexOf(project);
       this.editedItem = Object.assign({}, project);
       this.dialog = true;
+      console.log("Edited");
     },
 
     deleteItem(project) {
       const index = this.projects.indexOf(project);
+      fetch("http://localhost:3000/projects/" + project.id, {
+        method: "DELETE"
+      });
       confirm("Êtes-vous sûr de vouloir supprimer cet agent OMP ?") &&
         this.projects.splice(index, 1);
+      console.log("Deleted");
     },
 
     // deleteItem() {

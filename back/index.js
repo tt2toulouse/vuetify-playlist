@@ -1,10 +1,13 @@
 const mysql = require("mysql");
 
 const express = require("express");
+const bodyParser = require("body-parser");
 const app = express();
 const port = 3000;
 const cors = require("cors");
 app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 
 var con = mysql.createConnection({
   host: "localhost",
@@ -16,13 +19,6 @@ var con = mysql.createConnection({
 
 con.connect(function(err) {
   if (err) throw err;
-  // app.get("/agent", (req, res) => {
-  //   console.log("Connected!");
-  //   con.query("SELECT * FROM omp.agent", function(err, result) {
-  //     if (err) throw err;
-  //     res.send(result);
-  //   });
-  // });
 
   // Get all projects
   app.get("/projects", (req, res) => {
@@ -59,13 +55,20 @@ con.connect(function(err) {
 
   // Insert 1 project
   app.post("/projects", (req, res) => {
-    let proj = req.body;
+    let project = req.body;
     var sql =
       "SET @id = ?; SET @title = ?; SET @person = ?; SET @due = ?; SET @status = ?; SET @content = ?; \
-      CALL ProjectAddOrEdit(@id,@title,@person,@due,@status,@content);";
+      CALL projectAddOrEdit(@id,@title,@person,@due,@status,@content);";
     con.query(
       sql,
-      [proj.id, proj.title, proj.person, proj.due, proj.status, proj.content],
+      [
+        project.id,
+        project.title,
+        project.person,
+        project.due,
+        project.status,
+        project.content
+      ],
 
       (err, rows, fields) => {
         if (!err)
@@ -80,13 +83,20 @@ con.connect(function(err) {
 
   // Update 1 project
   app.put("/projects", (req, res) => {
-    let proj = req.body;
+    let project = req.body;
     var sql =
       "SET @id = ?; SET @title = ?; SET @person = ?; SET @due = ?; SET @status = ?; SET @content = ?; \
         CALL ProjectAddOrEdit(@id,@title,@person,@due,@status,@content);";
     con.query(
       sql,
-      [proj.id, proj.title, proj.person, proj.due, proj.status, proj.content],
+      [
+        project.id,
+        project.title,
+        project.person,
+        project.due,
+        project.status,
+        project.content
+      ],
 
       (err, rows, fields) => {
         if (!err) res.send("Updated successfully");
