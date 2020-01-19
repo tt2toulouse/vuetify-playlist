@@ -241,48 +241,54 @@ export default {
       }, 300);
     },
     save(project) {
-      if (this.editedIndex > -1) {
-        console.log("edited data");
-        console.log(this.editedItem);
+      // if (this.editedIndex > -1) {
+      //   console.log("edited data");
+      //   console.log(this.editedItem);
 
-        // axios
-        //   .put("/projects/" + this.editedItem.id, {
-        //     title: this.editedItem.title,
-        //     person: this.editedItem.person,
-        //     due: this.editedItem.due
-        //   })
+      //   // axios
+      //   //   .put("/projects/" + this.editedItem.id, {
+      //   //     title: this.editedItem.title,
+      //   //     person: this.editedItem.person,
+      //   //     due: this.editedItem.due
+      //   //   })
 
-        fetch("http://localhost:3000/projects/" + this.editedItem.id, {
-          method: "PUT",
-          body: JSON.stringify({
-            id: 0,
-            title: "",
-            person: "",
-            due: ""
-          })
-        }).then(response => {
-          console.log(response);
-        });
+      //   fetch("http://localhost:3000/projects/" + this.editedItem.id, {
+      //     method: "PUT",
+      //     body: JSON.stringify({
+      //       id: 0,
+      //       title: "",
+      //       person: "",
+      //       due: ""
+      //     })
+      //   }).then(response => {
+      //     console.log(response);
+      //   });
 
-        Object.assign(this.projects[this.editedIndex], this.editedItem);
-      } else {
-        console.log("created data");
-        console.log(this.editedItem);
+      //   Object.assign(this.projects[this.editedIndex], this.editedItem);
+      // } else {
 
-        fetch("http://localhost:3000/projects/" + this.editedItem.id, {
+        console.log(project);
+
+        const mockProject={
+          title: 'testFront',
+          person: 'testset',
+          due: "2012-09-09",
+          status: "testestestset",
+          content: "Blablabla"
+        }
+
+        fetch("http://localhost:3000/projects", {
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
           method: "POST",
-          body: JSON.stringify({
-            id: 0,
-            title: "",
-            person: "",
-            due: ""
-          })
-        }),
-          then(response => {
+          body: JSON.stringify(mockProject)
+        }).then(response => {
             console.log(response);
           });
         this.projects.push(this.editedItem);
-      }
+      // }
       this.close();
     }
   }

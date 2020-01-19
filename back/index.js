@@ -56,13 +56,21 @@ con.connect(function(err) {
   // Insert 1 project
   app.post("/projects", (req, res) => {
     let project = req.body;
+    console.log(req)
+    console.log(project);
+    // project={
+    //   title: 'test',
+    //   person: 'testset',
+    //   due: "2012-09-09",
+    //   status: "testestestset",
+    //   content: "Blablabla"
+    // }
     var sql =
-      "SET @id = ?; SET @title = ?; SET @person = ?; SET @due = ?; SET @status = ?; SET @content = ?; \
-      CALL projectAddOrEdit(@id,@title,@person,@due,@status,@content);";
+      "INSERT INTO projects (title, person, due, status, content) VALUES (?, ?, ?, ?, ?);";
+
     con.query(
       sql,
       [
-        project.id,
         project.title,
         project.person,
         project.due,
@@ -70,14 +78,14 @@ con.connect(function(err) {
         project.content
       ],
 
-      (err, rows, fields) => {
-        if (!err)
-          rows.forEach(element => {
-            if (element.constructor == Array)
-              res.send("Inserted project id : " + element[0].id);
-          });
-        else console.log(err);
-      }
+      // (err, rows, fields) => {
+      //   if (!err)
+      //     rows.forEach(element => {
+      //       if (element.constructor == Array)
+      //         res.send("Inserted project id : " + element[0].id);
+      //     });
+      //   else console.log(err);
+      // }
     );
   });
 
@@ -85,8 +93,7 @@ con.connect(function(err) {
   app.put("/projects", (req, res) => {
     let project = req.body;
     var sql =
-      "SET @id = ?; SET @title = ?; SET @person = ?; SET @due = ?; SET @status = ?; SET @content = ?; \
-        CALL ProjectAddOrEdit(@id,@title,@person,@due,@status,@content);";
+      "UPDATE project SET (title=#titre, etc.) WHERE id=#idduprojet;";
     con.query(
       sql,
       [
