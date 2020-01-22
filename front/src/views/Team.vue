@@ -79,86 +79,6 @@
           </template>
         </v-data-table>
       </template>
-
-      <!-- <div>
-        <v-dialog v-model="dialog" max-width="900px">
-          <v-btn slot="activator" color="primary" dark class="mb-2"
-            >Nouvel Agent</v-btn
-          >
-          <v-card>
-            <v-card-title>
-              <span class="headline">{{ formTitle }}</span>
-            </v-card-title>
-            <v-card-text>
-              <v-container grid-list-md>
-                <v-layout wrap>
-                  <v-flex xs12 sm12 md12>
-                    <v-text-field
-                      v-model="editedItem.title"
-                      label="Title"
-                      prepend-icon="account"
-                    ></v-text-field>
-                  </v-flex>
-                  <v-flex xs12 sm12 md12>
-                    <v-text-field
-                      v-model="editedItem.person"
-                      label="Person"
-                      prepend-icon="account"
-                    ></v-text-field>
-                  </v-flex>
-                  <v-flex xs12 sm12 md12>
-                    <v-text-field
-                      v-model="editedItem.due"
-                      label="Due"
-                      prepend-icon="date_range"
-                    ></v-text-field>
-                  </v-flex>
-                </v-layout>
-              </v-container>
-            </v-card-text>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn color="blue darken-1" flat @click.native="close"
-                >Cancel</v-btn
-              >
-              <v-btn color="blue darken-1" flat @click.native="save"
-                >Save</v-btn
-              >
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
-
-        <v-text-field
-          v-model="search"
-          append-icon="search"
-          label="Search"
-          single-line
-          hide-details
-          class="my-3"
-        ></v-text-field>
-
-        <v-data-table
-          :headers="headers"
-          :items="projects"
-          :search="search"
-          hide-actions
-          class="elevation-1"
-        >
-          <template slot="items" slot-scope="props">
-            <td class="text-xs">{{ props.item.title }}</td>
-            <td class="text-xs">{{ props.item.person }}</td>
-            <td class="text-xs">{{ props.item.due }}</td>
-            <td class="justify-center layout px-0">
-              <v-btn icon class="mx-0" @click="editItem(props.item)">
-                <v-icon color="teal">edit</v-icon>
-              </v-btn>
-              <v-btn icon class="mx-0" @click="deleteItem(props.item)">
-                <v-icon color="pink">delete</v-icon>
-              </v-btn>
-            </td>
-          </template>
-        </v-data-table>
-      </div>-->
     </v-container>
   </div>
 </template>
@@ -206,6 +126,7 @@ export default {
       });
     });
   },
+
   methods: {
     initialize() {
       this.projects = [
@@ -241,54 +162,64 @@ export default {
       }, 300);
     },
     save(project) {
-      // if (this.editedIndex > -1) {
-      //   console.log("edited data");
-      //   console.log(this.editedItem);
+      if (this.editedIndex > -1) {
+        console.log("edited data");
+        console.log(this.editedItem);
 
-      //   // axios
-      //   //   .put("/projects/" + this.editedItem.id, {
-      //   //     title: this.editedItem.title,
-      //   //     person: this.editedItem.person,
-      //   //     due: this.editedItem.due
-      //   //   })
+        //   // axios
+        //   //   .put("/projects/" + this.editedItem.id, {
+        //   //     title: this.editedItem.title,
+        //   //     person: this.editedItem.person,
+        //   //     due: this.editedItem.due
+        //   //   })
 
-      //   fetch("http://localhost:3000/projects/" + this.editedItem.id, {
-      //     method: "PUT",
-      //     body: JSON.stringify({
-      //       id: 0,
-      //       title: "",
-      //       person: "",
-      //       due: ""
-      //     })
-      //   }).then(response => {
-      //     console.log(response);
-      //   });
-
-      //   Object.assign(this.projects[this.editedIndex], this.editedItem);
-      // } else {
-
+        fetch("http://localhost:3000/projects/" + this.editedItem.id, {
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json"
+          },
+          method: "PUT",
+          body: JSON.stringify({
+            title: this.editedItem.title,
+            person: this.editedItem.person,
+            due: this.editedItem.due,
+            status: this.editedItem.status,
+            content: this.editedItem.content
+          })
+        }).then(response => {
+          console.log(response);
+        });
+        Object.assign(this.projects[this.editedIndex], this.editedItem);
+      } else {
         console.log(project);
 
-        const mockProject={
-          title: 'testFront',
-          person: 'testset',
-          due: "2012-09-09",
-          status: "testestestset",
-          content: "Blablabla"
-        }
+        // const mockProject = {
+        //   title: "testFront",
+        //   person: "testset",
+        //   due: "2012-09-09",
+        //   status: "testestestset",
+        //   content: "Blablabla"
+        // };
 
         fetch("http://localhost:3000/projects", {
           headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
+            Accept: "application/json",
+            "Content-Type": "application/json"
           },
           method: "POST",
-          body: JSON.stringify(mockProject)
+          // body: JSON.stringify(mockProject)
+          body: JSON.stringify({
+            title: this.editedItem.title,
+            person: this.editedItem.person,
+            due: this.editedItem.due,
+            status: this.editedItem.status,
+            content: this.editedItem.content
+          })
         }).then(response => {
-            console.log(response);
-          });
+          console.log(response);
+        });
         this.projects.push(this.editedItem);
-      // }
+      }
       this.close();
     }
   }

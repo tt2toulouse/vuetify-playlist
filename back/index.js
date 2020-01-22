@@ -5,9 +5,11 @@ const bodyParser = require("body-parser");
 const app = express();
 const port = 3000;
 const cors = require("cors");
+const axios = require("axios").default;
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.json());
 
 var con = mysql.createConnection({
   host: "localhost",
@@ -23,7 +25,7 @@ con.connect(function(err) {
   // Get all projects
   app.get("/projects", (req, res) => {
     console.log("Connected!");
-    con.query("SELECT * FROM omp.projects", function(err, result) {
+    con.query("SELECT id, title, person, due, content, status FROM omp.projects", function(err, result) {
       if (err) throw err;
       res.send(result);
     });
@@ -56,7 +58,7 @@ con.connect(function(err) {
   // Insert 1 project
   app.post("/projects", (req, res) => {
     let project = req.body;
-    console.log(req)
+    console.log(req);
     console.log(project);
     // project={
     //   title: 'test',
@@ -65,19 +67,17 @@ con.connect(function(err) {
     //   status: "testestestset",
     //   content: "Blablabla"
     // }
-    var sql =
-      "INSERT INTO projects (title, person, due, status, content) VALUES (?, ?, ?, ?, ?);";
-
+    var params = [
+      project.title,
+      project.person,
+      project.due,
+      project.status,
+      project.content
+    ];
     con.query(
-      sql,
-      [
-        project.title,
-        project.person,
-        project.due,
-        project.status,
-        project.content
-      ],
-
+      `INSERT INTO omp.projects SET title = ?, person = ?, due = ?, status = ?, content = ? `,
+      params,
+      res.send("Added !!")
       // (err, rows, fields) => {
       //   if (!err)
       //     rows.forEach(element => {
@@ -90,14 +90,12 @@ con.connect(function(err) {
   });
 
   // Update 1 project
-  app.put("/projects", (req, res) => {
+  app.put("/projects/:id", (req, res) => {
     let project = req.body;
-    var sql =
-      "UPDATE project SET (title=#titre, etc.) WHERE id=#idduprojet;";
-    con.query(
-      sql,
+    
+      con.query(
+        `UPDATE projects p SET title = ?, person = ?, due = ?, status = ?, content = ? WHERE p.id=` + req.params.id,
       [
-        project.id,
         project.title,
         project.person,
         project.due,
@@ -105,7 +103,7 @@ con.connect(function(err) {
         project.content
       ],
 
-      (err, rows, fields) => {
+       (err, res, rows) => {
         if (!err) res.send("Updated successfully");
         else console.log(err);
       }
