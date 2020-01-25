@@ -3,7 +3,7 @@
     <v-btn flat slot="activator" class="success">Add New Project</v-btn>
     <v-card>
       <v-card-title>
-        <h2>Add a New Project</h2>
+        <h2>Ajouter un nouvel agent OMP</h2>
       </v-card-title>
       <v-card-text>
         <v-form class="px-3" ref="form">
@@ -25,6 +25,7 @@
               slot="activator"
               :rules="inputRules"
               :value="formattedDate"
+              locale="fr"
               clearable
               label="Due date"
               prepend-icon="date_range"
@@ -76,21 +77,31 @@ export default {
           person: this.person,
           due: format(this.due, "Do MMM YYYY")
         };
-
       }
+      fetch("http://localhost:3000/projects", {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json"
+        },
+        method: "POST",
+        // body: JSON.stringify(mockProject)
+        body: JSON.stringify({
+          title: this.title,
+          person: this.person,
+          due: this.due,
+          status: this.status,
+          content: this.content
+        })
+      });
     }
   },
   computed: {
     formattedDate() {
       console.log(this.due);
-      return this.due ? format(this.due, "Do MMM YYYY") : "";
+      return this.due ? format(this.due, "Do MMMM YYYY") : "";
     }
   },
 
-  created() {
-
-  }
-
-
+  created() {}
 };
 </script>

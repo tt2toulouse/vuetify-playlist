@@ -58,11 +58,9 @@ DROP TABLE IF EXISTS `projects`;
  SET character_set_client = utf8mb4 ;
 CREATE TABLE `projects` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `title` varchar(100) NOT NULL,
-  `person` varchar(100) NOT NULL,
-  `due` date NOT NULL,
-  `status` varchar(100) DEFAULT NULL,
-  `content` text,
+  `lastname` varchar(100) NOT NULL,
+  `firstname` varchar(100) NOT NULL,
+  `due` date NOT NULL
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;

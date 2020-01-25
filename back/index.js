@@ -5,7 +5,6 @@ const bodyParser = require("body-parser");
 const app = express();
 const port = 3000;
 const cors = require("cors");
-const axios = require("axios").default;
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -25,87 +24,71 @@ con.connect(function(err) {
   // Get all projects
   app.get("/projects", (req, res) => {
     console.log("Connected!");
-    con.query("SELECT id, title, person, due, content, status FROM omp.projects", function(err, result) {
+    con.query(`SELECT * FROM omp.projects`, function(err, result) {
       if (err) throw err;
       res.send(result);
     });
   });
 
-  // Get 1 project by id
-  app.get("/projects/:id", (req, res) => {
-    con.query(
-      "SELECT * FROM omp.projects WHERE id=?",
-      [req.params.id],
-      (err, rows, fields) => {
-        if (!err) res.send(rows);
-        else console.log(err);
+
+  app.get("/projects", (req, res) => {
+    con.query(`SELECT * FROM omp.projects`, (err, result) => {
+      if (err) {
+        //  If an error has occurred, then the user is informed of the error
+        res.status(500).send("Erreur lors de la récupération des agents OMP");
+      } else {
+        // If everything went well, we send the result of the SQL query as JSON.
+        res.json(resuts);
       }
-    );
+    }
+  );
   });
 
   // Delete 1 project by id
   app.delete("/projects/:id", (req, res) => {
-    con.query(
-      "DELETE FROM omp.projects WHERE id=?",
-      [req.params.id],
-      (err, rows, fields) => {
-        if (!err) res.send("deleted");
-        else console.log(err);
+    const idProject = req.params.id;
+
+    con.query(`DELETE FROM omp.projects WHERE id=?`, [idProject], err => {
+      if (err) {
+        // If an error has occurred, then the user is informed of the error
+        console.log(err);
+        res.status(500).send("Errueur de supprssion d'un agent OMP");
+      } else {
+        // If everything went well, we send a status "ok".
+        res.sendStatus(200);
       }
-    );
+    });
   });
 
   // Insert 1 project
   app.post("/projects", (req, res) => {
-    let project = req.body;
-    console.log(req);
-    console.log(project);
-    // project={
-    //   title: 'test',
-    //   person: 'testset',
-    //   due: "2012-09-09",
-    //   status: "testestestset",
-    //   content: "Blablabla"
-    // }
-    var params = [
-      project.title,
-      project.person,
-      project.due,
-      project.status,
-      project.content
-    ];
-    con.query(
-      `INSERT INTO omp.projects SET title = ?, person = ?, due = ?, status = ?, content = ? `,
-      params,
-      res.send("Added !!")
-      // (err, rows, fields) => {
-      //   if (!err)
-      //     rows.forEach(element => {
-      //       if (element.constructor == Array)
-      //         res.send("Inserted project id : " + element[0].id);
-      //     });
-      //   else console.log(err);
-      // }
-    );
+    const project = req.body;
+
+    con.query(`INSERT INTO omp.projects SET ?`, project, (err, results) => {
+      if (err) {
+        console.log(err);
+        res.status(500).send("Erreur lors de la sauvegarde d'un agent OMP");
+      } else {
+        res.sendStatus(200);
+      }
+    });
   });
 
   // Update 1 project
-  app.put("/projects/:id", (req, res) => {
-    let project = req.body;
-    
-      con.query(
-        `UPDATE projects p SET title = ?, person = ?, due = ?, status = ?, content = ? WHERE p.id=` + req.params.id,
-      [
-        project.title,
-        project.person,
-        project.due,
-        project.status,
-        project.content
-      ],
+  app.put("/projects", (req, res) => {
+    const idProject = req.body.id;
+    const project = req.body;
 
-       (err, res, rows) => {
-        if (!err) res.send("Updated successfully");
-        else console.log(err);
+    con.query(
+      `UPDATE projects SET ? WHERE id = ?`,
+      [project, idProject],
+      err => {
+        if (err) {
+          console.log(err);
+          res.status(500).send("Erreur lors de la modification d'un agent OMP");
+        } else {
+          res.sendStatus(200);
+        }
       }
     );
   });
