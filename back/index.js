@@ -3,6 +3,7 @@ const mysql = require("mysql");
 const express = require("express");
 const bodyParser = require("body-parser");
 const app = express();
+const axios = require("axios");
 const port = 3000;
 const cors = require("cors");
 app.use(cors());
@@ -30,7 +31,6 @@ con.connect(function(err) {
     });
   });
 
-
   app.get("/projects", (req, res) => {
     con.query(`SELECT * FROM omp.projects`, (err, result) => {
       if (err) {
@@ -40,8 +40,7 @@ con.connect(function(err) {
         // If everything went well, we send the result of the SQL query as JSON.
         res.json(resuts);
       }
-    }
-  );
+    });
   });
 
   // Delete 1 project by id
@@ -75,8 +74,8 @@ con.connect(function(err) {
   });
 
   // Update 1 project
-  app.put("/projects", (req, res) => {
-    const idProject = req.body.id;
+  app.put("/projects/:id", (req, res) => {
+    const idProject = req.params.id;
     const project = req.body;
 
     con.query(

@@ -86,6 +86,7 @@
 
 <script>
 import format from "date-fns/format";
+import axios from "axios";
 
 export default {
   data: () => ({
@@ -133,30 +134,37 @@ export default {
       });
     });
   },
+
   methods: {
-    initialize() {
-      this.projects = [
-        {
-          lastname: "project.lastname",
-          firstname: "project.firstname",
-          due: format(this.due, "Do MMM YYYY")
-        }
-      ];
+    fetchProjects() {
+      axios.get("http://localhost:3000/projects").then(response => {
+        console.log(response);
+        this.projects = response.data.data;
+      });
     },
+
+    initialize() {
+      this.fetchProjects();
+    },
+
     editItem(item) {
       this.editedIndex = this.projects.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
     },
+
     deleteItem(project) {
       const index = this.projects.indexOf(project);
-      fetch("http://localhost:3000/projects/" + project.id, {
-        method: "DELETE"
-      });
       confirm("Êtes-vous sûr de vouloir supprimer cet agent OMP ?") &&
         this.projects.splice(index, 1);
-      console.log("Deleted");
+      console.log("Agent supprimé");
+      axios
+        .delete("http://localhost:3000/projects/" + project.id)
+        .then(response => {
+          console.log(response);
+        });
     },
+
     close() {
       this.dialog = false;
       setTimeout(() => {
@@ -164,40 +172,32 @@ export default {
         this.editedIndex = -1;
       }, 300);
     },
-    save(project) {
+
+    save() {
       if (this.editedIndex > -1) {
-        console.log("edited data");
-        fetch("http://localhost:3000/projects/" + this.editedItem.id, {
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json"
-          },
-          method: "PUT",
-          body: JSON.stringify({
+        axios
+          .put("http://localhost:3000/projects/" + this.editedItem.id, {
             lastname: this.editedItem.lastname,
             firstname: this.editedItem.firstname,
             due: this.editedItem.due
           })
-        }).then(response => {
-          console.log(response);
-        });
+          .then(response => {
+            console.log(response);
+          });
+
         Object.assign(this.projects[this.editedIndex], this.editedItem);
       } else {
-        console.log(project);
-        fetch("http://localhost:3000/projects", {
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json"
-          },
-          method: "POST",
-          body: JSON.stringify({
+        console.log("created data");
+        console.log(this.editedItem);
+        axios
+          .post("http://localhost:3000/projects", {
             lastname: this.editedItem.lastname,
             firstname: this.editedItem.firstname,
             due: this.editedItem.due
           })
-        }).then(response => {
-          console.log(response);
-        });
+          .then(response => {
+            console.log(response);
+          });
         this.projects.push(this.editedItem);
       }
       this.close();
