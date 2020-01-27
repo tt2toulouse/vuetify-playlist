@@ -27,13 +27,29 @@
                       label="Prénom"
                     ></v-text-field>
                   </v-flex>
-                  <v-flex xs12 sm12 md12>
+                  <!-- <v-flex xs12 sm12 md12>
                     <v-text-field
                       v-model="editedItem.due"
                       label="Date de départ"
                       :value="formattedDate"
                     ></v-text-field>
-                  </v-flex>
+                  </v-flex> -->
+
+                  <v-menu v-model="menu" :close-on-content-click="false">
+                    <v-text-field
+                      slot="activator"
+                      :value="formattedDate"
+                      locale="fr"
+                      clearable
+                      label="Date de départ"
+                      prepend-icon="date_range"
+                    >
+                    </v-text-field>
+                    <v-date-picker
+                      v-model="editedItem.due"
+                      @change="menu = false"
+                    ></v-date-picker>
+                  </v-menu>
                 </v-container>
               </v-form>
             </v-card-text>
@@ -98,6 +114,7 @@ export default {
       { text: "Date de départ", value: "due" },
       { text: "Actions", value: "id", sortable: false }
     ],
+    menu: false,
     projects: [],
     editedIndex: -1,
     editedItem: {
@@ -117,8 +134,12 @@ export default {
     },
 
     formattedDate() {
-      console.log(this.due);
-      return this.due ? format(this.due, "Do MMM YYYY") : "";
+      return this.editedItem.due
+        ? format(this.editedItem.due, "Do MMMM YYYY")
+        : "";
+      // var dateobj = new Date("MMMM DD, YYYY");
+
+      // var B = dateobj.toISOString();
     }
   },
   watch: {
