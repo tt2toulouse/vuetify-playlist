@@ -16,7 +16,7 @@
           <v-text-field
             v-model="person"
             label="Person"
-            prepend-icon="account"
+            prepend-icon="person"
             :rules="inputRules"
           ></v-text-field>
 

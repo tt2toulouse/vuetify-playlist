@@ -19,35 +19,35 @@
                     <v-text-field
                       v-model="editedItem.lastname"
                       label="Nom"
+                      prepend-icon="person"
                     ></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm12 md12>
                     <v-text-field
                       v-model="editedItem.firstname"
                       label="Prénom"
+                      prepend-icon="person"
                     ></v-text-field>
                   </v-flex>
-                  <!-- <v-flex xs12 sm12 md12>
-                    <v-text-field
-                      v-model="editedItem.due"
-                      label="Date de départ"
-                      :value="formattedDate"
-                    ></v-text-field>
-                  </v-flex> -->
-
                   <v-menu v-model="menu" :close-on-content-click="false">
                     <v-text-field
                       slot="activator"
                       :value="formattedDate"
-                      locale="fr"
+                      locale="fr-fr"
                       clearable
                       label="Date de départ"
                       prepend-icon="date_range"
                     >
                     </v-text-field>
+                    <!-- <v-date-picker
+                      v-model="editedItem.due"
+                      @change="menu = false"
+                    ></v-date-picker> -->
                     <v-date-picker
                       v-model="editedItem.due"
                       @change="menu = false"
+                      :first-day-of-week="1"
+                      locale="fr-fr"
                     ></v-date-picker>
                   </v-menu>
                 </v-container>
@@ -79,10 +79,11 @@
         <v-data-table
           :headers="headers"
           :items="projects"
+          :search="search"
           sort-by="due"
           class="mb-3"
         >
-          <template slot="items" slot-scope="props">
+          <template slot="items" slot-scope="props" locale="fr-fr">
             <td class="text-xs">{{ props.item.lastname }}</td>
             <td class="text-xs">{{ props.item.firstname }}</td>
             <td class="text-xs">{{ props.item.due }}</td>
@@ -135,11 +136,8 @@ export default {
 
     formattedDate() {
       return this.editedItem.due
-        ? format(this.editedItem.due, "Do MMMM YYYY")
+        ? format(this.editedItem.due, "DD MMM YYYY")
         : "";
-      // var dateobj = new Date("MMMM DD, YYYY");
-
-      // var B = dateobj.toISOString();
     }
   },
   watch: {
@@ -147,27 +145,26 @@ export default {
       val || this.close();
     }
   },
-  created() {
-    this.initialize();
-    fetch("http://localhost:3000/projects").then(projectsFromBackend => {
-      const json = projectsFromBackend.json().then(json => {
-        this.projects = json;
+  async created() {
+    axios.get("http://localhost:3000/projects").then(response => {
+      console.log(response.data);
+      this.projects = response.data;
+      const dateOptions = {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric"
+      };
+      this.projects.forEach(project => {
+        project.due = new Date(project.due).toLocaleDateString(
+          "fr-FR",
+          dateOptions
+        );
       });
     });
   },
 
   methods: {
-    fetchProjects() {
-      axios.get("http://localhost:3000/projects").then(response => {
-        console.log(response);
-        this.projects = response.data.data;
-      });
-    },
-
-    initialize() {
-      this.fetchProjects();
-    },
-
     editItem(item) {
       this.editedIndex = this.projects.indexOf(item);
       this.editedItem = Object.assign({}, item);
@@ -205,6 +202,7 @@ export default {
           .then(response => {
             console.log(response);
           });
+        this.projects.push(this.editedItem);
 
         Object.assign(this.projects[this.editedIndex], this.editedItem);
       } else {
